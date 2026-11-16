@@ -19,7 +19,8 @@ export function getClientIp(request: NextRequest) {
 }
 
 export async function rateLimit(key: string, limit: number, windowSeconds: number) {
-  const rows = await (await import("@/lib/db")).sql`
+  const { getSql } = await import("@/lib/db");
+  const rows = await getSql()`
     INSERT INTO rate_limits (key, count, window_started_at)
     VALUES (${key}, 1, now())
     ON CONFLICT (key) DO UPDATE SET
