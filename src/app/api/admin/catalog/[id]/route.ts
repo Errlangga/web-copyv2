@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { sql } from "@/lib/db";
+import { getSql } from "@/lib/db";
 import { requireAdmin } from "@/lib/auth";
 import { jsonError, verifySameOrigin } from "@/lib/security";
 import { catalogSchema } from "@/lib/validation";
@@ -16,7 +16,7 @@ export async function PUT(request: NextRequest, context: Context) {
   if (!parsed.success) return jsonError("Data katalog tidak valid", 400);
   const d = parsed.data;
   try {
-    const rows = await sql`
+    const rows = await getSql()`
       UPDATE catalogs SET title=${d.title}, description=${d.description}, content=${d.content},
       document_url=${d.documentUrl ?? null}, document_name=${d.documentName ?? null}, updated_at=now()
       WHERE id=${id} RETURNING id
@@ -34,7 +34,7 @@ export async function DELETE(request: NextRequest, context: Context) {
   const { id } = await context.params;
   if (!validId(id)) return jsonError("ID tidak valid", 400);
   try {
-    const rows = await sql`DELETE FROM catalogs WHERE id=${id} RETURNING id`;
+    const rows = await getSql()`DELETE FROM catalogs WHERE id=${id} RETURNING id`;
     if (!rows.length) return jsonError("Katalog tidak ditemukan", 404);
     return NextResponse.json({ ok: true });
   } catch {
