@@ -20,7 +20,7 @@ export default async function CatalogDetail({ params }: { params: Promise<{ id: 
 
   let rows: CatalogRow[] = [];
   try {
-    rows = await getSql()`SELECT id, title, description, content, document_url AS "documentUrl", document_name AS "documentName" FROM catalogs WHERE id=${id} LIMIT 1`;
+    rows = (await getSql()`SELECT id, title, description, content, document_url AS "documentUrl", document_name AS "documentName" FROM catalogs WHERE id=${id} LIMIT 1`) as unknown as CatalogRow[];
   } catch {
     return <main className="wrap detail"><p>Database unavailable.</p><Link href="/">← Back</Link></main>;
   }
