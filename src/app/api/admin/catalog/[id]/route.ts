@@ -14,19 +14,18 @@ export async function PUT(request: NextRequest, context: Context) {
   const { id } = await context.params;
   if (!validId(id)) return jsonError("ID tidak valid", 400);
   const parsed = catalogSchema.safeParse(await request.json());
-  if (!parsed.success) return jsonError("Data katalog tidak valid", 400);
+  if (!parsed.success) return jsonError(parsed.error.issues[0]?.message||"Data katalog tidak valid", 400);
   const d = parsed.data;
   try {
     const rows = await getSql()`
       UPDATE catalogs SET title=${d.title}, description=${d.description}, content=${d.content},
-      document_url=${d.documentUrl ?? null}, document_name=${d.documentName ?? null}, updated_at=now()
+      document_url=${d.documentUrl ?? null}, document_name=${d.documentName ?? null},
+      access_type=${d.accessType}, price=${d.accessType==="paid"?d.price:null}, updated_at=now()
       WHERE id=${id} RETURNING id
     `;
     if (!rows.length) return jsonError("Katalog tidak ditemukan", 404);
     return NextResponse.json({ ok: true });
-  } catch {
-    return jsonError("Gagal memperbarui katalog", 500);
-  }
+  } catch { return jsonError("Gagal memperbarui katalog", 500); }
 }
 
 export async function DELETE(request: NextRequest, context: Context) {
@@ -38,7 +37,5 @@ export async function DELETE(request: NextRequest, context: Context) {
     const rows = await getSql()`DELETE FROM catalogs WHERE id=${id} RETURNING id`;
     if (!rows.length) return jsonError("Katalog tidak ditemukan", 404);
     return NextResponse.json({ ok: true });
-  } catch {
-    return jsonError("Gagal menghapus katalog", 500);
-  }
+  } catch { return jsonError("Gagal menghapus katalog", 500); }
 }
