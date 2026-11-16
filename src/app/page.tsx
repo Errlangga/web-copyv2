@@ -1,5 +1,5 @@
 import Link from "next/link";
-import CatalogBrowser from "@/components/CatalogBrowser";
+import CatalogBrowserV2 from "@/components/CatalogBrowserV2";
 import SiteLinks from "@/components/SiteLinks";
 
 export default function Home() {
@@ -15,8 +15,8 @@ export default function Home() {
       <div className="actions"><a className="btn primary" href="#archive">Buka arsip ↗</a><SiteLinks /></div>
     </section>
     <section className="section" id="archive">
-      <div className="sectionhead"><div><div className="eyebrow">THE FORBIDDEN COLLECTION</div><h2>Arsip pilihan</h2></div></div>
-      <CatalogBrowser/>
+      <div className="sectionhead"><div><div className="eyebrow">THE FORBIDDEN COLLECTION</div><h2>Arsip pilihan</h2><p className="muted">Koleksi prompt gratis dan premium.</p></div></div>
+      <CatalogBrowserV2/>
     </section>
     <footer className="footer"><span>NOCTURNE999 © {new Date().getFullYear()}</span><span>NOTHING IS LOST. NOTHING IS SAFE.</span><Link href="/admin">ADMIN ACCESS ↗</Link></footer>
   </main>;
