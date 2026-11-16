@@ -5,7 +5,7 @@ export default function AdminPage() {
   return (
     <main className="wrap">
       <nav className="nav">
-        <Link className="brand" href="/">COPY<span>VAULT</span></Link>
+        <Link className="brand" href="/">NOCTURNE<span>999</span></Link>
         <span className="eyebrow">SECURE CONSOLE</span>
       </nav>
       <AdminPanel />
