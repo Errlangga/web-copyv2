@@ -12,7 +12,12 @@ export default async function PromptPage({params}:{params:Promise<{id:string}>})
  catch{return <main className="wrap detail"><p>Database unavailable.</p><Link href="/">← Back</Link></main>}
  const item=rows[0];if(!item)notFound();
  let settings:{whatsappUrl:string|null;purchaseUrl:string|null}={whatsappUrl:null,purchaseUrl:null};
- if(item.accessType==="paid"){try{const s=await getSql()`SELECT whatsapp_url AS "whatsappUrl",purchase_url AS "purchaseUrl" FROM site_settings WHERE id=TRUE LIMIT 1`;settings=s[0]||settings}catch{}}
+ if(item.accessType==="paid"){
+  try{
+   const s=await getSql()`SELECT whatsapp_url AS "whatsappUrl",purchase_url AS "purchaseUrl" FROM site_settings WHERE id=TRUE LIMIT 1`;
+   settings={whatsappUrl:s[0]?.whatsappUrl??null,purchaseUrl:s[0]?.purchaseUrl??null};
+  }catch{}
+ }
  const buyUrl=settings.purchaseUrl||settings.whatsappUrl;
  const money=new Intl.NumberFormat("id-ID",{style:"currency",currency:"IDR",maximumFractionDigits:0}).format(Number(item.price||0));
  return <main className="wrap"><nav className="nav"><Link className="brand" href="/">NOCTURNE<span>999</span></Link><Link className="btn" href="/">← Archive</Link></nav>
