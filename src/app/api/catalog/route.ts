@@ -1,12 +1,11 @@
 import { NextResponse } from "next/server";
-import { sql } from "@/lib/db";
+import { getSql } from "@/lib/db";
 
 export const runtime = "nodejs";
 
 export async function GET() {
   try {
-    // Keep full text out of the listing response; it is fetched only on the detail page.
-    const rows = await sql`
+    const rows = await getSql()`
       SELECT id, title, description, document_url AS "documentUrl",
              document_name AS "documentName", created_at AS "createdAt"
       FROM catalogs ORDER BY created_at DESC
