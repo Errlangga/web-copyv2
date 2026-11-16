@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { sql } from "@/lib/db";
+import { getSql } from "@/lib/db";
 import { requireAdmin } from "@/lib/auth";
 import { jsonError, verifySameOrigin } from "@/lib/security";
 import { catalogSchema } from "@/lib/validation";
@@ -13,7 +13,7 @@ export async function POST(request: NextRequest) {
   if (!parsed.success) return jsonError("Data katalog tidak valid", 400);
   const d = parsed.data;
   try {
-    const rows = await sql`
+    const rows = await getSql()`
       INSERT INTO catalogs (title, description, content, document_url, document_name)
       VALUES (${d.title}, ${d.description}, ${d.content}, ${d.documentUrl ?? null}, ${d.documentName ?? null})
       RETURNING id
