@@ -1,0 +1,12 @@
+"use client";
+import {useEffect,useMemo,useState} from "react";
+import Link from "next/link";
+import Image from "next/image";
+type Item={id:string;title:string;description:string;documentUrl:string|null;documentName:string|null;accessType:"free"|"paid";price:number|null};
+export default function CatalogBrowserV2(){
+ const [items,setItems]=useState<Item[]>([]);const [query,setQuery]=useState("");const [filter,setFilter]=useState("all");const [error,setError]=useState("");
+ useEffect(()=>{fetch("/api/catalog").then(r=>r.ok?r.json():Promise.reject()).then(d=>setItems(d.catalogs||[])).catch(()=>setError("Katalog belum dapat dimuat."));},[]);
+ const filtered=useMemo(()=>items.filter(x=>(x.title+" "+x.description).toLowerCase().includes(query.toLowerCase())&&(filter==="all"||x.accessType===filter)),[items,query,filter]);
+ const money=(v:number|null)=>new Intl.NumberFormat("id-ID",{style:"currency",currency:"IDR",maximumFractionDigits:0}).format(Number(v||0));
+ return <><div className="catalog-tools"><input className="search" placeholder="Cari prompt..." value={query} onChange={e=>setQuery(e.target.value)}/><div className="filter-row"><button className={filter==="all"?"filter active":"filter"} onClick={()=>setFilter("all")}>Semua</button><button className={filter==="free"?"filter active":"filter"} onClick={()=>setFilter("free")}>Gratis</button><button className={filter==="paid"?"filter active":"filter"} onClick={()=>setFilter("paid")}>Berbayar</button></div></div>{error&&<p className="muted">{error}</p>}<div className="grid" style={{marginTop:18}}>{filtered.map(item=><article className="catalog" key={item.id}><div className="row" style={{justifyContent:"space-between"}}><div className="tag">PROMPT / {item.id.slice(0,6).toUpperCase()}</div><span className={item.accessType==="paid"?"price-tag":"free-tag"}>{item.accessType==="paid"?money(item.price):"GRATIS"}</span></div>{item.documentUrl&&<Image src={item.documentUrl} alt={item.documentName||item.title} width={480} height={240} unoptimized style={{width:"100%",height:150,objectFit:"cover",marginTop:14,border:"1px solid #3b171e"}}/>}<h3>{item.title}</h3><p>{item.description||"No description available."}</p><Link className="btn" href={"/prompt/"+item.id}>{item.accessType==="paid"?"Detail & beli ↗":"Buka prompt gratis ↗"}</Link></article>)}</div>{!error&&!filtered.length&&<p className="muted" style={{marginTop:24}}>{items.length?"Tidak ada hasil yang cocok.":"Belum ada katalog. Koleksi akan muncul di sini."}</p>}</>;
+}
