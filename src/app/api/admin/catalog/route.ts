@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getSql } from "@/lib/db";
 import { requireAdmin } from "@/lib/auth";
-import { jsonError, verifySameOrigin } from "@/lib/security";
+import { getClientIp, jsonError, rateLimit, verifySameOrigin } from "@/lib/security";
 import { catalogSchema } from "@/lib/validation";
 
 export const runtime = "nodejs";
@@ -9,6 +9,7 @@ export const runtime = "nodejs";
 export async function POST(request: NextRequest) {
   if (!verifySameOrigin(request)) return jsonError("Origin tidak valid", 403);
   if (!(await requireAdmin(request))) return jsonError("Tidak diizinkan", 401);
+  if (!(await rateLimit("catalog-write:" + getClientIp(request), 60, 900))) return jsonError("Terlalu banyak permintaan", 429);
   const parsed = catalogSchema.safeParse(await request.json());
   if (!parsed.success) return jsonError("Data katalog tidak valid", 400);
   const d = parsed.data;
