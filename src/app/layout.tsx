@@ -2,8 +2,8 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "CopyVault — Text Archive",
-  description: "A curated archive of text, templates, and digital notes.",
+  title: "Nocturne999 — Temukan prompt gratis disini",
+  description: "Nocturne999 — arsip prompt dan teks pilihan.",
   robots: { index: true, follow: true }
 };
 
