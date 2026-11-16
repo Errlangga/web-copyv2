@@ -35,10 +35,9 @@ export async function POST(request: NextRequest) {
       access: "public",
       token: process.env.BLOB_READ_WRITE_TOKEN,
       addRandomSuffix: false,
-      contentType: file.type,
-      contentDisposition: "attachment"
+      contentType: file.type
     });
-    return NextResponse.json({ url: blob.url, name: file.name });
+    return NextResponse.json({ url: blob.downloadUrl, name: file.name });
   } catch {
     return jsonError("Upload dokumen gagal", 500);
   }
