@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { put } from "@vercel/blob";
 import { requireAdmin } from "@/lib/auth";
-import { jsonError, verifySameOrigin } from "@/lib/security";
+import { getClientIp, jsonError, rateLimit, verifySameOrigin } from "@/lib/security";
 
 export const runtime = "nodejs";
 
@@ -10,6 +10,7 @@ const allowed = new Set(["application/pdf", "text/plain", "application/vnd.openx
 export async function POST(request: NextRequest) {
   if (!verifySameOrigin(request)) return jsonError("Origin tidak valid", 403);
   if (!(await requireAdmin(request))) return jsonError("Tidak diizinkan", 401);
+  if (!(await rateLimit("upload:" + getClientIp(request), 12, 3600))) return jsonError("Batas upload tercapai. Coba lagi nanti.", 429);
   if (!process.env.BLOB_READ_WRITE_TOKEN) return jsonError("Upload belum dikonfigurasi", 503);
   const length = Number(request.headers.get("content-length") || 0);
   if (length > 5.5 * 1024 * 1024) return jsonError("Ukuran maksimal 5 MB", 413);
