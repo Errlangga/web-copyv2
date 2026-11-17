@@ -14,8 +14,16 @@ export async function POST(request: NextRequest) {
     const body = loginSchema.safeParse(await request.json());
     if (!body.success) return jsonError("Format login tidak valid", 400);
     const username = process.env.ADMIN_USERNAME;
-    const hash = process.env.ADMIN_PASSWORD_HASH;
-    if (!username || !hash) return jsonError("Konfigurasi admin belum lengkap", 503);
+    if (!username) return jsonError("Konfigurasi admin belum lengkap", 503);
+    const sql = (await import("@/lib/db")).getSql();
+    await sql`CREATE TABLE IF NOT EXISTS admin_credentials (
+      id BOOLEAN PRIMARY KEY DEFAULT TRUE CHECK (id = TRUE),
+      password_hash TEXT NOT NULL,
+      updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
+    )`;
+    const credentials = await sql`SELECT password_hash FROM admin_credentials WHERE id=TRUE LIMIT 1`;
+    const hash = credentials[0]?.password_hash || process.env.ADMIN_PASSWORD_HASH;
+    if (!hash) return jsonError("Konfigurasi admin belum lengkap", 503);
     const valid = body.data.username === username && await bcrypt.compare(body.data.password, hash);
     if (!valid) return jsonError("Username atau password salah", 401);
     await createSession();
